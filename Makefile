@@ -27,6 +27,7 @@ $(BIN_DIR)/%.o: src/%.c $(HS) | $(BIN_DIR)
 $(BIN_DIR):
 	mkdir -p $@
 
+test: $(TEST_EXE)
 run-test: $(TEST_EXE)
 	@$<
 

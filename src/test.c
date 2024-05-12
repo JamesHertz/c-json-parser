@@ -8,7 +8,7 @@
 #include "da-array.h"
 
 #define error(fmt, ...) fprintf(stderr, "[ERROR]: " fmt  __VA_OPT__(,) __VA_ARGS__)
-#define info(fmt,  ...) printf( "[INFO]: " fmt __VA_OPT__(,) __VA_ARGS__)
+#define info(fmt,  ...) printf("[INFO]: " fmt __VA_OPT__(,) __VA_ARGS__)
 
 #define next_nr_assert(value) do {           \
        assert(value);                        \
@@ -173,24 +173,24 @@ void run_da_tests(){
         v = i * 2;
         pda_add(int, values, &v);
         curr_length ++;
-
+    
         assert(values->values[i] == v);
         assert(values->length == curr_length);
     }
 
     assert(pda_find(int, values, eq_func, NULL) == 5);
-
+    
     next_nr_assert(values->length == 11);
-
+    
     v = values->values[5];
     pda_remove(int, values, 5);
-
+    
     curr_length--;
     assert(values->values[4] != v);
     assert(values->values[5] != v);
     assert(values->values[3] != v);
     next_nr_assert(values->length == curr_length);
-
+    
     for(size_t i = 0; i < 4; i++){
         v = values->values[values->length - 1];
         pda_remove(int, values, values->length - 1);
@@ -199,26 +199,26 @@ void run_da_tests(){
         assert(values->values[values->length - 1] != curr_length);
         assert(values->values[values->length - 2] != curr_length);
     }
-
-    info("start to remove on the front\n");
     
     for(size_t i = 0; i < 4; i++){
         v = values->values[0];
         pda_remove(int, values, 0);
         curr_length--;
         assert(values->length == curr_length);
-        assert(values->values[0] != curr_length);
-        assert(values->values[1] != curr_length);
+        assert(values->values[0] != v);
+        assert(values->values[1] != v);
     }
+    
+    curr_length -= 2;
+    pda_remove(int, values, 0);
+    pda_remove(int, values, 0);
+    
+    next_nr_assert(
+           curr_length == values->length
+        && curr_length == 0
+    );
 
-    // curr_length -= 2;
-    // pda_remove(int, values, 0);
-    // pda_remove(int, values, 0);
-    //
-    // next_nr_assert(
-    //              curr_length == values->length
-    //         && curr_length == 0
-    // );
+    pda_destroy(values);
 }
 
 int main(void){
