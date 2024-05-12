@@ -33,12 +33,15 @@ typedef struct{
     json_value_t value;
 } json_object_entry_t;
 
+
+// WARNING: please do no change the order of the fields (for more look at da-array.h)
 struct _json_array_ {
     size_t length;
     size_t size;
     json_value_t  * values;
 };
 
+// WARNING: please do no change the order of the fields (for more look at da-array.h)
 struct _json_object_ {
     size_t length;
     size_t size;
@@ -116,14 +119,25 @@ const char * json_valuetype2str(json_value_type_t type);
 // `value`     value where to store the array
 // `init_size` initial size of the arrray (use 0 if you have no idea of the initial size)
 // @return 0 if everything was okay and -1 if it got problems allocating memory
-// int json_array_init(json_value_t value, size_t init_size);
+inline json_array_t * json_array_new(size_t init_size);
+inline int  json_array_add(json_array_t * array, json_value_t value);
+inline void json_array_remove(json_array_t * array, size_t position);
 
-// // helper functions
-// json_object_entry_t * json_object_iterator_init(json_object_t * obj);
-// json_object_entry_t * json_object_iteration_next(json_object_t * obj, json_object_t * last_entry);
-//
-// json_value_t * json_array_iterator_init(json_array_t * obj);
-// json_value_t * json_array_iterator_next(json_object_t * obj, json_value_t * last_value);
+inline json_object_t * json_object_new(size_t init_size);
+// only borrows key and makes it own personal copy
+int  json_object_set(json_object_t * obj, const char * key, json_value_t value);
+void json_object_remove(json_object_t * array, size_t position);
+
+void json_destroy_array(json_array_t * array);
+void json_destroy_object(json_object_t * object);
+void json_destroy_value(json_value_t value);
+
+// helper functions
+json_object_entry_t * json_object_iterator_init(json_object_t * obj);
+json_object_entry_t * json_object_iteration_next(json_object_t * obj, json_object_t * last_entry);
+
+json_value_t * json_array_iterator_init(json_array_t * array);
+json_value_t * json_array_iterator_next(json_array_t * array, json_value_t * last_value);
 
 
 #endif

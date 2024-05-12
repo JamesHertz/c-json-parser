@@ -14,7 +14,7 @@ typedef struct{
     void * values;
 } da_array;
 
-typedef bool (*find_func)(void * ctx, void * elem);
+typedef bool (*find_func)(void * ctx, const void * elem);
 
 da_array * da_init(size_t elem_size, size_t intial_size);
 int da_add(size_t elem_size, da_array * array, void * elem);
@@ -30,11 +30,19 @@ size_t da_find(size_t elem_size, da_array * array, find_func func, void * ctx);
 // takes ownership c:
 void da_destroy(da_array * array);
 
-#define pda_init(type, initsize)            da_init(sizeof(type), initsize)
-#define pda_add(type, array, elem)          da_add(sizeof(type), (da_array*) array, elem)
-#define pda_set(type, array, pos, elem)     da_set(sizeof(type), (da_array*) array, pos, elem)
-#define pda_remove(type, array, pos)        da_remove(sizeof(type), (da_array*) array, pos)
-#define pda_fast_remove(type, array, pos)   da_fast_remove(sizeof(type), (da_array*) array, pos) 
-#define pda_find(type, array, func, ctx)    da_find(sizeof(type), (da_array*) array, func, ctx) 
-#define pda_destroy(array)                  da_destroy((da_array*) array) 
+// the return result is a borrowed pointer and it should not be changed
+void * da_iterator_init(da_array * array);
+// returns the address to the next elem and NULL to determinte that is over
+void * da_iterator_next(size_t elem_size, da_array * array, void * previous);
+
+#define pda_init(type, initsize)              da_init(sizeof(type), initsize)
+#define pda_add(type, array, elem)            da_add(sizeof(type), (da_array*) array, elem)
+#define pda_set(type, array, pos, elem)       da_set(sizeof(type), (da_array*) array, pos, elem)
+#define pda_remove(type, array, pos)          da_remove(sizeof(type), (da_array*) array, pos)
+#define pda_fast_remove(type, array, pos)     da_fast_remove(sizeof(type), (da_array*) array, pos) 
+#define pda_find(type, array, func, ctx)      da_find(sizeof(type), (da_array*) array, func, (void*) ctx) 
+#define pda_destroy(array)                    da_destroy((da_array*) array) 
+#define pda_iterator_init(array)              da_iterator_init((da_array*) array)
+#define pda_iterator_next(type, array, prev)  da_iterator_next(sizeof(type), (da_array*) array, prev)
+
 #endif

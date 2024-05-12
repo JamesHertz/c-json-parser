@@ -147,8 +147,6 @@ void run_tests(){
     );
 }
 
-
-
 bool eq_func(void * ctx, void * elem){
     return *(int *) elem == 10;
 }
@@ -177,6 +175,24 @@ void run_da_tests(){
         assert(values->values[i] == v);
         assert(values->length == curr_length);
     }
+
+    {
+        int i = 0;
+        int * ptr = pda_iterator_init(values);
+        while(ptr != NULL){
+            assert(*ptr == 2 * i++);
+            ptr = pda_iterator_next(int, values, ptr);
+        }
+
+        assert(i == 11);
+
+        while(i-- > 0){
+            assert(ptr == NULL);
+            ptr = pda_iterator_next(int, values, ptr);
+        }
+
+    }
+
 
     assert(pda_find(int, values, eq_func, NULL) == 5);
     

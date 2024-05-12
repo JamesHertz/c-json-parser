@@ -7,6 +7,8 @@
 #define DEFAULT_SIZE 8
 #define CALC_POS(position)  (array->values + elem_size * (position))
 
+#define errorf(fmt, ...) fprintf(stderr, "[ERROR] %s:%d %s: " fmt "\n", __FILE__, __LINE__, __func__ __VA_OPT__(,) __VA_ARGS__)
+
 da_array * da_init(size_t elem_size, size_t initial_size){
     da_array * ptr = json_mem_alloc(sizeof(da_array));
     if(ptr == NULL) return ptr;
@@ -53,9 +55,7 @@ void da_set(size_t elem_size, da_array * array, size_t position, void * elem){
 
 void da_remove(size_t elem_size, da_array * array, size_t position){
     if(position >= array->length){
-        fprintf(
-            stderr, "[ERROR] Trying to remove position %zu in array with length %zu.", position, array->length
-        );
+        errorf("Trying to remove position %zu in array with length %zu.", position, array->length);
         exit(1);
     }
 
@@ -69,9 +69,7 @@ void da_remove(size_t elem_size, da_array * array, size_t position){
 
 void da_fast_remove(size_t elem_size, da_array * array, size_t position){
     if(position >= array->length){
-        fprintf(
-            stderr, "[ERROR] Trying to remove position %zu in array with length %zu.", position, array->length
-        );
+        errorf("Trying to remove position %zu in array with length %zu.", position, array->length);
         exit(1);
     }
 
@@ -94,5 +92,25 @@ size_t da_find(size_t elem_size, da_array * array, find_func func, void * ctx){
 
 void da_destroy(da_array * array){
     json_mem_release(array->values);
+    array->values = NULL;
+    array->length = 0;
+    array->size   = 0;
     json_mem_release(array);
+}
+
+// the return result is a borrowed pointer and it should not be changed
+void * da_iterator_init(da_array * array){
+    return array->length == 0 ? NULL : array->values;
+}
+// returns the address to the next elem and NULL to determinte that is over
+void * da_iterator_next(size_t elem_size, da_array * array, void * previous){
+    if(previous == NULL || array->length == 0 || previous >= CALC_POS(array->length - 1))
+        return NULL;
+
+    if(previous < array->values){
+        errorf("Previous pointer points outside range of array!!");
+        exit(1);
+    }
+
+    return previous + elem_size;
 }
