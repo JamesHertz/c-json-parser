@@ -65,7 +65,7 @@ void run_scanner(const  char * filename){
                 return;
             case TOKEN_NUMBER:
             case TOKEN_STRING:
-                printf("- %.*s\n", (int) token.error_or_lenth.lenght, token.lexeme);
+                printf("- %.*s\n", (int) token.error_or_lenth.lexeme_lenght, token.lexeme);
                 break;
             default:
                 printf("- %s\n", ttype2str(token.type));

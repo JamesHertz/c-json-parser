@@ -19,7 +19,7 @@ typedef struct {
     const char * lexeme;
     size_t  line_nr;
     union {
-        size_t  lenght;       // used for token
+        size_t  lexeme_lenght;
         error_t errcode;
     } error_or_lenth;
 } token_t;

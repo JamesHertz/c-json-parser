@@ -1,6 +1,5 @@
 #ifndef __JSON_ERROR__
 #define __JSON_ERROR__
-#include <err.h>
 #include <stdio.h>
 
 typedef enum {
