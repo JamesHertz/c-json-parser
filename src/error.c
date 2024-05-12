@@ -1,6 +1,6 @@
 #include "error.h"
 
-const char * error2str(error_t error){
+const char * error2str(error_code_t error){
     switch (error) {
         case SCANNER_UNKNOWN_ESCAPE:
             return "Unknown escaped sequence symbol.";
@@ -11,7 +11,7 @@ const char * error2str(error_t error){
         case SCANNER_BAD_NUMBER_FORMAT:
             return "No well-formatted number (should end with a digit).";
         case SCANNER_INVALID_INDENTIFIER:
-            return "Invalid indentifier, should've been either 'true' or 'false'";
+            return "Invalid indentifier, should've been either 'true', 'false' or 'null'";
         default:
             return NULL;
     }

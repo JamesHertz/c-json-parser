@@ -9,6 +9,8 @@
 #include "error.h"
 #include "scanner.h"
 
+
+
 void print_token_error(const char * source, token_t token){
     printf("Error: %s\n", error2str(token.error_or_lenth.errcode));
 

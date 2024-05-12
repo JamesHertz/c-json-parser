@@ -44,24 +44,26 @@ static void scanner_skip_spaces(scanner_t * scan){
 
 }
 
-static token_t scanner_make_token(const scanner_t * scan, token_type_t type){
-    token_t result =  {
+static inline token_t scanner_make_token(const scanner_t * scan, token_type_t type){
+    return (token_t) {
         .type      = type,
         .lexeme    = scan->start,
-        .line_nr   = scan->curr_line
+        .line_nr   = scan->curr_line,
+        .error_or_lenth = {
+            .lexeme_lenght = (scan->current - scan->start)
+        }
     };
-    result.error_or_lenth.lenght = (scan->current - scan->start);
-    return result;
 }
 
-static token_t scanner_make_error(const scanner_t * scan, error_t errcode){
-    token_t error = {
+static inline token_t scanner_make_error(const scanner_t * scan, error_code_t errcode){
+    return (token_t) {
         .type     = TOKEN_ERROR,
         .lexeme   = scan->current - 1,
-        .line_nr  = scan->curr_line
+        .line_nr  = scan->curr_line,
+        .error_or_lenth = {
+            .errcode = errcode
+        }
     };
-    error.error_or_lenth.errcode= errcode;
-    return error;
 }
 
 static token_t scanner_scan_string(scanner_t *scan){
@@ -126,12 +128,17 @@ static token_t scanner_scan_identifier(scanner_t *scan){
 
     size_t size = scan->current - scan->start;
 
+    // TODO: use a trie c:
     if(strncmp("true", scan->start, size) == 0){
         return scanner_make_token(scan, TOKEN_TRUE);
     } 
 
     if(strncmp("false", scan->start, size) == 0){
         return scanner_make_token(scan, TOKEN_FALSE);
+    }
+
+    if(strncmp("null", scan->start, size) == 0){
+        return scanner_make_token(scan, TOKEN_NULL);
     }
 
     // little hack to get better error msg c:
@@ -200,6 +207,7 @@ const char * ttype2str(token_type_t type){
         CASE(TOKEN_NUMBER);
         CASE(TOKEN_COLON);
         CASE(TOKEN_COMMA);
+        CASE(TOKEN_NULL);
         CASE(TOKEN_TRUE);
         CASE(TOKEN_FALSE);
         CASE(TOKEN_ERROR);

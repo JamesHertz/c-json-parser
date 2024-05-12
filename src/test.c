@@ -1,9 +1,11 @@
-#include "error.h"
-#include "scanner.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
+
+#include "error.h"
+#include "scanner.h"
+#include "da-array.h"
 
 #define error(fmt, ...) fprintf(stderr, "[ERROR]: " fmt  __VA_OPT__(,) __VA_ARGS__)
 #define info(fmt,  ...) printf( "[INFO]: " fmt __VA_OPT__(,) __VA_ARGS__)
@@ -12,6 +14,11 @@
        assert(value);                        \
        info("test %02d [OK]\n", test_nr++);  \
     }while(0)
+
+// #define assert_test(value, name) do {       \
+//        assert(value);                       \
+//        info("test %-20.20s [OK]\n", name);  \
+//     }while(0)
 
 #define varg_sequence(...) ((token_type_t[]){__VA_ARGS__ __VA_OPT__(,) TOKEN_EOF})
 
@@ -67,7 +74,7 @@ bool check_stream(token_type_t expected[], const char * source){
 
 
 // by now I support only one error c:
-bool check_error(error_t errcode, const char * source){
+bool check_error(error_code_t errcode, const char * source){
    scanner_t scan;
    scanner_init(&scan, source);
 
@@ -97,16 +104,16 @@ bool check_eofs(){
    return true;
 }
 
-
 void run_tests(){
+    info("Running scanner tests");
 
     int test_nr = 0;
     next_nr_assert(check_stream( 
          varg_sequence(
             TOKEN_LEFT_BRACE,   TOKEN_RIGHT_BRACE,
-            TOKEN_LEFT_BRACKET, TOKEN_RIGHT_BRACKET,
-            TOKEN_COMMA, TOKEN_COLON, TOKEN_TRUE, TOKEN_FALSE
-        ), "{}[],: true false"
+            TOKEN_LEFT_BRACKET, TOKEN_RIGHT_BRACKET, TOKEN_COMMA, 
+            TOKEN_COLON, TOKEN_TRUE, TOKEN_FALSE, TOKEN_NULL
+        ), "{}[],: true false null"
     ));
 
     next_nr_assert(check_stream(
@@ -135,10 +142,87 @@ void run_tests(){
             && check_error(SCANNER_INVALID_INDENTIFIER, "True")
             && check_error(SCANNER_INVALID_INDENTIFIER, "falsE")
             && check_error(SCANNER_INVALID_INDENTIFIER, "truefalse")
+            && check_error(SCANNER_INVALID_INDENTIFIER, "Null")
+            && check_error(SCANNER_INVALID_INDENTIFIER, "nulltruefalse")
     );
+}
+
+
+
+bool eq_func(void * ctx, void * elem){
+    return *(int *) elem == 10;
+}
+
+void run_da_tests(){
+    info("Running Dynamic Array tests\n");
+
+    int test_nr = 0;
+    typedef struct {
+        size_t length;
+        size_t size;
+        // replace void with the respective 
+        // type of yours dynamic array c:
+        int * values;
+    } * int_array;
+
+    int_array values = (int_array) pda_init(int, 0);
+    size_t curr_length  = 0;
+    int v;
+
+    for(int i = 0; i < 11; i++){
+        v = i * 2;
+        pda_add(int, values, &v);
+        curr_length ++;
+
+        assert(values->values[i] == v);
+        assert(values->length == curr_length);
+    }
+
+    assert(pda_find(int, values, eq_func, NULL) == 5);
+
+    next_nr_assert(values->length == 11);
+
+    v = values->values[5];
+    pda_remove(int, values, 5);
+
+    curr_length--;
+    assert(values->values[4] != v);
+    assert(values->values[5] != v);
+    assert(values->values[3] != v);
+    next_nr_assert(values->length == curr_length);
+
+    for(size_t i = 0; i < 4; i++){
+        v = values->values[values->length - 1];
+        pda_remove(int, values, values->length - 1);
+        curr_length--;
+        assert(values->length == curr_length);
+        assert(values->values[values->length - 1] != curr_length);
+        assert(values->values[values->length - 2] != curr_length);
+    }
+
+    info("start to remove on the front\n");
+    
+    for(size_t i = 0; i < 4; i++){
+        v = values->values[0];
+        pda_remove(int, values, 0);
+        curr_length--;
+        assert(values->length == curr_length);
+        assert(values->values[0] != curr_length);
+        assert(values->values[1] != curr_length);
+    }
+
+    // curr_length -= 2;
+    // pda_remove(int, values, 0);
+    // pda_remove(int, values, 0);
+    //
+    // next_nr_assert(
+    //              curr_length == values->length
+    //         && curr_length == 0
+    // );
 }
 
 int main(void){
     run_tests();
+    run_da_tests();
     return 0;
 }

@@ -11,7 +11,7 @@ HS       := $(wildcard src/*.h)
 ALL_OBJ  := $(SRC:src/%.c=$(BIN_DIR)/%.o)
 EXE_OBJ  := $(filter-out $(TEST_EXE).o , $(ALL_OBJ)) 
 TEST_OBJ := $(filter-out $(EXE).o , $(ALL_OBJ)) 
-FLAGS    := 
+FLAGS    := -DJSON_MEM_FAIL_STOP
 
 all: $(EXE)
 

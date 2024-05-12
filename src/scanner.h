@@ -9,7 +9,7 @@ typedef enum {
     TOKEN_RIGHT_BRACE,   TOKEN_LEFT_BRACE,
     TOKEN_COLON, TOKEN_COMMA,
 
-    TOKEN_TRUE, TOKEN_FALSE,
+    TOKEN_NULL, TOKEN_TRUE, TOKEN_FALSE,
     TOKEN_STRING, TOKEN_NUMBER, 
     TOKEN_ERROR, TOKEN_EOF
 } token_type_t;
@@ -20,7 +20,7 @@ typedef struct {
     size_t  line_nr;
     union {
         size_t  lexeme_lenght;
-        error_t errcode;
+        error_code_t errcode;
     } error_or_lenth;
 } token_t;
 
